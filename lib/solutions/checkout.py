@@ -129,4 +129,6 @@ def checkout(skus):
                 total -= (products[sku] * mixed_offer_discount)
                 discount_counter += products[sku]
                 products[sku] = 0
+                if int((mixed_offer_counter - discount_counter) / 3) == 0:
+                    return total
     return total
