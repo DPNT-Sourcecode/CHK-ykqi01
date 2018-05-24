@@ -1,23 +1,13 @@
 # Our price table and offers: 
-# +------+-------+----------------+
-# | Item | Price | Special offers |
-# +------+-------+----------------+
-# | A    | 50    | 3A for 130     |
-# | B    | 30    | 2B for 45      |
-# | C    | 20    |                |
-# | D    | 15    |                |
-# +------+-------+----------------+
-
-
-# Notes: 
-#  - For any illegal input return -1
-
-# In order to complete the round you need to implement the following method:
-#      checkout(String) -> Integer
-
-# Where:
-#  - param[0] = a String containing the SKUs of all the products in the basket
-#  - @return = an Integer representing the total checkout value of the items 
+# +------+-------+------------------------+
+# | Item | Price | Special offers         |
+# +------+-------+------------------------+
+# | A    | 50    | 3A for 130, 5A for 200 |
+# | B    | 30    | 2B for 45              |
+# | C    | 20    |                        |
+# | D    | 15    |                        |
+# | E    | 40    | 2E get one B free      |
+# +------+-------+------------------------+
 
 from collections import Counter
 
@@ -26,11 +16,13 @@ prices = {
     "B": 30,
     "C": 20,
     "D": 15,
+    "E": 40,
 }
 
 offers = {
-    "A": (3, 20),
-    "B": (2, 15),
+    "A": [(5, 50), (3, 20)]
+    "B": [(2, 15)],
+    "E": [(2, 30)],
 }
 
 # noinspection PyUnusedLocal
@@ -39,6 +31,14 @@ def checkout(skus):
     products = Counter(skus)
     total = 0
 
+    if products.get("E") > 1:
+        freebie = int(products["E"] / 2)
+        b_count = products.get("B")
+        if not b_count:
+            total -= (freebie * prices["B"])
+        else:
+            products["B"] -= freebie
+
     for product, count in products.iteritems():
         if product not in prices:
             return -1
@@ -46,8 +46,15 @@ def checkout(skus):
         total += (prices[product] * count) 
         offer = offers.get(product)
         if offer:
-            discount = int(count / offers[product][0]) * offers[product][1]
-            total -= discount 
+            for each in offer:
+                counter = int(count / each[0])
+                discount = counter * each[1]
+                total -= discount
+                count -= counter * each[0]
+    
+    return total
+                
+
     
     return total
 
