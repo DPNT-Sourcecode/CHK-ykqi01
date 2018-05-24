@@ -133,12 +133,9 @@ def checkout(skus):
     products = Counter(skus)
 
     products = apply_freebie(products)
-    products, total = apply_bulk_discount(products)
-    print(products, total)
-
+    try:
+        products, total = apply_bulk_discount(products)
+    except ValueError:
+        return -1
 
     return total
-
-def run():
-    for t in ["SSSZ", "ZZZS", "STXS", "STX"]:
-        print(t, checkout(t))
