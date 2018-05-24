@@ -22,7 +22,6 @@ prices = {
 offers = {
     "A": [(5, 50), (3, 20)],
     "B": [(2, 15)],
-    "E": [(2, 30)],
 }
 
 # noinspection PyUnusedLocal
