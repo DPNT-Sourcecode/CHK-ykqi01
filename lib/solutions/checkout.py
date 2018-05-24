@@ -40,12 +40,6 @@ offers = {
     "P": [(5, 50)],
     "Q": [(3, 10)],
     "V": [(3, 20), (2, 10)],
-    # mixed offer calculated individually first
-    "S": [(3, 15)],
-    "T": [(3, 15)],
-    "X": [(3, 6)],
-    "Y": [(3, 15)],
-    "Z": [(3, 18)],
 }
 
 mixed_offers = [
