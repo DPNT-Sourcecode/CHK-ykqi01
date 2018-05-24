@@ -32,23 +32,6 @@
 
 from collections import Counter
 
-offers = {
-    "A": [(5, 50), (3, 20)],
-    "B": [(2, 15)],
-    "H": [(10, 20), (5, 5)],
-    "K": [(2, 20)],
-    "P": [(5, 50)],
-    "Q": [(3, 10)],
-    "V": [(3, 20), (2, 10)],
-}
-
-mixed_offers = [
-    ("Z", 6), 
-    ("S", 5),
-    ("T", 5),
-    ("Y", 5),
-    ("X", 2),
-]
 
 prices = {
     "A": 50,    # 3A for 130, 5A for 200          |
@@ -79,39 +62,48 @@ prices = {
     "Z": 21,    # buy any 3 of (S,T,X,Y,Z) for 45 |
 }
 
-freebies = {
-    "E": (2, "B"),
-    "F": (3, "F"),
-    "N": (3, "M"), 
-    "R": (3, "Q"),
-    "U": (4, "U"),
-}
 
 def apply_freebie(products):
-    for sku, rule in freebies.iteritems():
+    freebies = {
+        "E": (2, "B"),
+        "F": (3, "F"),
+        "N": (3, "M"), 
+        "R": (3, "Q"),
+        "U": (4, "U"),
+    }
+    for sku, rule in freebies.items():
         counter = products.get(sku)
-        if counter:
-            freebie = int(products[sku] / rule[0])
-            freebie_count = products.get(rule[1])
-            if freebie_count:
-                products[rule[1]] -= freebie
-                if products[rule[1]] < 0:
-                    products[rule[1]] = 0
+        if not counter:
+            continue
+        freebie = int(products[sku] / rule[0])
+        freebie_count = products.get(rule[1])
+        if freebie_count:
+            products[rule[1]] -= freebie
+            if products[rule[1]] < 0:
+                products[rule[1]] = 0
     return products
 
-
-# noinspection PyUnusedLocal
-# skus = unicode string
-def checkout(skus):
-    products = Counter(skus)
+def apply_bulk_discount(products):
+    offers = {
+        "A": [(5, 50), (3, 20)],
+        "B": [(2, 15)],
+        "H": [(10, 20), (5, 5)],
+        "K": [(2, 20)],
+        "P": [(5, 50)],
+        "Q": [(3, 10)],
+        "V": [(3, 20), (2, 10)],
+    }
+    mixed_offers = [
+        ("Z", 6), 
+        ("S", 5),
+        ("T", 5),
+        ("Y", 5),
+        ("X", 2),
+    ]
     total = 0
-
-    products = apply_freebie(products)
-
-    for product, count in products.iteritems():
+    for product, count in products.items():
         if product not in prices:
-            return -1
-
+            raise ValueError("invalid product")
         total += (prices[product] * count) 
         offer = offers.get(product)
         if offer:
@@ -120,15 +112,33 @@ def checkout(skus):
                 discount = counter * each[1]
                 total -= discount
                 count -= counter * each[0]
+            products[product] = count
 
-    mixed_offer_counter = sum([products.get(p, 0) for p in products if p in [sku for (sku, _) in mixed_offers]])
-    discount_counter = 0
-    while int((mixed_offer_counter - discount_counter) / 3) > 0:
-        for sku, mixed_offer_discount in mixed_offers:
-            if products.get(sku, 0) > 0:
-                total -= (products[sku] * mixed_offer_discount)
-                discount_counter += products[sku]
-                products[sku] = 0
-                if int((mixed_offer_counter - discount_counter) / 3) == 0:
-                    return total
+    mixed_offers_counter = sum([products[p] for (p, _) in mixed_offers])
+    cutoff = mixed_offers_counter % 3
+    if mixed_offers_counter > 2:
+        for mixed_offer, mixed_offer_discount in mixed_offers:
+            if products.get(mixed_offer) > 0:
+                for _ in range(products[mixed_offer]):
+                    mixed_offers_counter -= 1
+                    if mixed_offers_counter < cutoff:
+                        break
+                    total -= mixed_offer_discount
+
+    return products, total
+
+# noinspection PyUnusedLocal
+# skus = unicode string
+def checkout(skus):
+    products = Counter(skus)
+
+    products = apply_freebie(products)
+    products, total = apply_bulk_discount(products)
+    print(products, total)
+
+
     return total
+
+def run():
+    for t in ["SSSZ", "ZZZS", "STXS", "STX"]:
+        print(t, checkout(t))
