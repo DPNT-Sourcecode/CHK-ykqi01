@@ -7,6 +7,7 @@
 # | C    | 20    |                        |
 # | D    | 15    |                        |
 # | E    | 40    | 2E get one B free      |
+# | F    | 10    | 2F get one F free      |
 # +------+-------+------------------------+
 
 from collections import Counter
@@ -17,6 +18,7 @@ prices = {
     "C": 20,
     "D": 15,
     "E": 40,
+    "F": 10,
 }
 
 offers = {
@@ -36,6 +38,10 @@ def checkout(skus):
         if b_count:
             products["B"] -= freebie
 
+    if products.get("F") > 2:
+        freebie = int(products["F"] / 3)
+        products["F"] -= freebie
+
     for product, count in products.iteritems():
         if product not in prices:
             return -1
@@ -50,10 +56,3 @@ def checkout(skus):
                 count -= counter * each[0]
     
     return total
-                
-
-    
-    return total
-
-
-
