@@ -73,10 +73,10 @@ prices = {
 
 freebies = {
     "E": (2, "B"),
-    "F": (2, "F"),
+    "F": (3, "F"),
     "N": (3, "M"), 
     "R": (3, "Q"),
-    "U": (3, "U"),
+    "U": (4, "U"),
 }
 
 def apply_freebie(products):
