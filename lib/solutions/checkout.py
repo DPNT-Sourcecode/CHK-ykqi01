@@ -34,9 +34,7 @@ def checkout(skus):
     if products.get("E") > 1:
         freebie = int(products["E"] / 2)
         b_count = products.get("B")
-        if not b_count:
-            total -= (freebie * prices["B"])
-        else:
+        if b_count:
             products["B"] -= freebie
 
     for product, count in products.iteritems():
