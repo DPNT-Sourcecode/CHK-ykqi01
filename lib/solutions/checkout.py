@@ -122,12 +122,11 @@ def checkout(skus):
                 count -= counter * each[0]
 
     mixed_offer_counter = sum([products.get(p, 0) for p in products if p in [sku for (sku, _) in mixed_offers]])
-    if mixed_offer_counter > 2:
-        discount_counter = 0
+    discount_counter = 0
+    while int((mixed_offer_counter - discount_counter) / 3) > 0:
         for sku, mixed_offer_discount in mixed_offers:
-            if (mixed_offer_counter - discount_counter) / 3 > 0:
-                if products.get(sku, 0) > 0:
-                    total -= (products[sku] * mixed_offer_discount)
-                    discount_counter += products[sku]
-                    products[sku] = 0
+            if products.get(sku, 0) > 0:
+                total -= (products[sku] * mixed_offer_discount)
+                discount_counter += products[sku]
+                products[sku] = 0
     return total
